@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心理压力测试</title>
+    <style>
+        /* 简单美化一下样式 */
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background-color: #f5f7fa; }
+        #app { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .progress-bar-bg { background: #eee; height: 8px; border-radius: 4px; margin-bottom: 20px; }
+        #pb { background: #4a90e2; height: 100%; width: 0%; border-radius: 4px; transition: width 0.3s; }
+        h3 { color: #333; margin-bottom: 20px; line-height: 1.4; }
+        #opts { display: flex; flex-direction: column; gap: 10px; }
+        button { padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer; transition: 0.2s; font-size: 16px; }
+        button:hover { background: #4a90e2; color: white; border-color: #4a90e2; }
+        #result { display: none; text-align: center; }
+        .score-display { font-size: 48px; font-weight: bold; color: #4a90e2; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="quiz">
+        <div class="progress-bar-bg"><div id="pb"></div></div>
+        <h3 id="q-text">加载中...</h3>
+        <div id="opts"></div>
+    </div>
+
+    <div id="result">
+        <h2>测试完成</h2>
+        <p>你的总分是：</p >
+        <div class="score-display" id="total-score">0</div>
+        <p id="eval-text"></p >
+        <button onclick="location.reload()" style="margin-top: 20px; background: #f0f0f0;">重新测试</button>
+    </div>
+</div>
+
+<script>
+    // 这里是你提供的核心逻辑
+    const questions = [
+        {q: "在过去一个月，你是否因意外发生的事而心烦意乱？", r: false},
+        {q: "在过去一个月，你是否觉得无法控制生活中的重要事情？", r: false},
+        {q: "在过去一个月，你是否感到神经过敏或压力很大？", r: false},
+        {q: "在过去一个月，你是否感到有信心处理个人问题？", r: true},
+        {q: "在过去一个月，你是否觉得事情正按你的意愿发展？", r: true},
+        {q: "在过去一个月，你是否发现自己无法处理必须做的事？", r: false},
+        {q: "在过去一个月，你是否能控制生活中的烦恼？", r: true},
+        {q: "在过去一个月，你是否感觉到自己常处于领先地位？", r: true},
+        {q: "在过去一个月，你是否因事情超出控制而感到愤怒？", r: false},
+        {q: "在过去一个月，你是否觉得困难堆积如山无法克服？", r: false}
+    ];
+    const opts = ["从不", "几乎不", "有时", "较多", "经常"];
+    let step = 0, score = 0;
+
+    function show() {
+        document.getElementById('pb').style.width = (step/questions.length)*100 + '%';
+        document.getElementById('q-text').innerText = (step + 1) + ". " + questions[step].q;
+        let html = '';
+        opts.forEach((o, i) => {
+            // r为true是反向计分：经常=0分，从不=4分
+            let s = questions[step].r ? (4-i) : i;
+            html += `<button onclick="next(${s})">${o}</button>`;
+        });
+        document.getElementById('opts').innerHTML = html;
+    }
+
+    window.next = (s) => {
+        score += s;
+        step++;
+        if(step < questions.length) {
+            show();
+        } else {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('total-score').innerText = score;
+            let msg = score <= 13 ? "压力较小，状态不错！" : (score <= 26 ? "压力中等，注意休息。" : "压力较高，建议放松或咨询专业人士。");
+            document.getElementById('eval-text').innerText = msg;
+        }
+    }
+    
+    show(); // 初始化显示第一题
+</script>
+
+</body>
+</html>
